@@ -1,0 +1,26 @@
+{
+  "5": {
+    "RequestInfo": {
+      "id": "Cand_1",
+      "role": "CANDIDATE"
+    },
+    "Application": {
+      "candidateId": "Cand_1",
+      "jobId": "Job_123",
+      "status": "APPLIED",
+      "appliedDate": "2024-06-01T10:00:00Z"
+    }
+  },
+  "6": {
+    "RequestInfo": {
+      "id": "Rec_1",
+      "role": "RECRUITER"
+    },
+    "Feedback": {
+      "level": "beginner enty",
+      "application": "app_1",
+      "status": "UNDER_REVIEW",
+      "comments": "Candidate shows potential but lacks experience."
+    }
+  }
+}

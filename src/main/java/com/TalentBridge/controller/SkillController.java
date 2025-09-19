@@ -20,13 +20,7 @@ public class SkillController {
 
     @PostMapping("/create")
     public ResponseEntity<SkillResponse> createSkill(@RequestBody Skill skill) {
-        Skill createdSkill = skillService.createSkill(skill);
-
-        SkillResponse response = new SkillResponse();
-        response.setSkill(createdSkill);
-        response.setStatus(CreationStatus.CREATED);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(skillService.createSkill(skill));
     }
 
     @GetMapping("/all")

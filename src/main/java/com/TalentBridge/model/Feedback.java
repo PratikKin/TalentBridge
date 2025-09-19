@@ -18,9 +18,11 @@ public class Feedback {
 
     private Status status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "application_id")
-    private Application application;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "application_id")
+//    private Application application;
+
+    private String applicationId;
 
     private String comments;
     private String createdAt;

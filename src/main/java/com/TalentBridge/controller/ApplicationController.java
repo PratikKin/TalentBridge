@@ -4,6 +4,7 @@ package com.TalentBridge.controller;
 import com.TalentBridge.model.Application;
 import com.TalentBridge.service.ApplicationService;
 import com.TalentBridge.wrapper.ApplicationRequest;
+import com.TalentBridge.wrapper.utility.ApplicationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,8 @@ public class ApplicationController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createApplication(@RequestBody ApplicationRequest request) {
-        Application application = applicationService.createApplication(request);
-
-        return ResponseEntity.ok().body(
-                new ApplicationResponse(application, "created")
-        );
+        ApplicationResponse response = applicationService.createApplication(request);
+        return ResponseEntity.ok(response);
     }
 
-    // Inner Response DTO
-    record ApplicationResponse(Application application, String status) {}
 }

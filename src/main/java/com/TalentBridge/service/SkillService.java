@@ -1,48 +1,43 @@
 package com.TalentBridge.service;
 
 import com.TalentBridge.model.Skill;
-import com.TalentBridge.repository.SkillRepository;
+import com.TalentBridge.wrapper.SkillResponse;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class SkillService {
 
-    private final SkillRepository skillRepository;
+    private final WebClient.Builder webClientBuilder;
 
-    public SkillService(SkillRepository skillRepository) {
-        this.skillRepository = skillRepository;
+    private static final String CREATE_SKILL_API = "http://localhost:8082/api/skills"; // external API URL
+
+    public SkillResponse createSkill(Skill skill) {
+        // Use WebClient to send the Skill object to external API
+        return webClientBuilder.build()
+                .post()
+                .uri(CREATE_SKILL_API+"/create")
+                .bodyValue(skill)
+                .retrieve()
+                .bodyToMono(SkillResponse.class)
+                .block(); // blocking since service expects immediate result
     }
 
 
-    public Skill createSkill(Skill skill) {
-        if (skill.getId() == null || skill.getId().isEmpty()) {
-            // Fetch last skill ID
-            String lastSkillId = skillRepository.findTopByOrderByIdDesc()
-                    .map(Skill::getId)
-                    .orElse(null);
-
-            int nextIdNumber = 1;
-            if (lastSkillId != null && lastSkillId.startsWith("Skill_")) {
-                try {
-                    nextIdNumber = Integer.parseInt(lastSkillId.split("_")[1]) + 1;
-                } catch (NumberFormatException e) {
-                    nextIdNumber = 1; // fallback if parsing fails
-                }
-            }
-
-            skill.setId("Skill_" + nextIdNumber);
-        }
-
-        return skillRepository.save(skill);
-    }
 
     public List<Skill> getAllSkills() {
-        return skillRepository.findAll();
+        return webClientBuilder.build()
+                .get()
+                .uri(CREATE_SKILL_API+"/get")
+                .retrieve()
+                .bodyToFlux(Skill.class)  // Expecting an array/list of skills
+                .collectList()            // Convert Flux<Skill> -> List<Skill>
+                .block();                 // block() for synchronous call
     }
 
 }

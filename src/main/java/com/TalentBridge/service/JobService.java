@@ -1,59 +1,42 @@
 package com.TalentBridge.service;
 
-import com.TalentBridge.model.Job;
-import com.TalentBridge.model.Skill;
-import com.TalentBridge.repository.JobRepository;
-import com.TalentBridge.repository.SkillRepository;
 import com.TalentBridge.wrapper.JobResponse;
 import com.TalentBridge.wrapper.utility.JobRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class JobService {
 
-    private final JobRepository jobRepository;
-    private final SkillRepository skillRepository;
 
-    public Job createJob(JobRequest request) {
-        Job job = new Job();
+    private final WebClient.Builder webClientBuilder;
 
-        // Generate sequential job ID
-        String lastId = jobRepository.findLastJobId();
-        int nextId = 1;
-        if (lastId != null && lastId.startsWith("JOB_")) {
-            try {
-                nextId = Integer.parseInt(lastId.replace("JOB_", "")) + 1;
-            } catch (NumberFormatException ignored) {}
-        }
-        job.setId("JOB_" + nextId);
+    private static final String JOB_API_URL = "http://localhost:8082/api/jobs";
 
-        // Set job fields
-        job.setCompanyName(request.getJob().getCompanyName());
-        job.setTitle(request.getJob().getJobTitle());
-        job.setQualification(request.getJob().getQualification());
-        job.setLocation(request.getJob().getLocation());
-        job.setSalary(request.getJob().getSalary());
-        job.setExperience(request.getJob().getExperience());
-        job.setDescription(request.getJob().getDescription());
-        job.setPostedDate(request.getJob().getPostedDate());
-        job.setLastUpdated(request.getJob().getPostedDate());
+    public JobResponse createJob(JobRequest request) {
+        WebClient client = webClientBuilder.build();
 
-        // Resolve skills by ID from DB
-        List<Skill> skills = request.getJob().getSkills().stream()
-                .map(skillRef -> skillRepository.findById(skillRef.getId())
-                        .orElseThrow(() -> new RuntimeException("Skill not found: " + skillRef.getId())))
-                .toList();
-
-        job.setSkills(skills);
-
-        return jobRepository.save(job);
+        return client.post()
+                .uri(JOB_API_URL + "/create")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(JobResponse.class)
+                .block(); // block since controller expects sync response
     }
 
-    public List<Job> getAllJobs() {
-        return jobRepository.findAll();
+    public List<JobResponse> getAllJobs() {
+        WebClient client = webClientBuilder.build();
+
+        return client.get()
+                .uri(JOB_API_URL + "/all")
+                .retrieve()
+                .bodyToMono(JobResponse[].class) // external API returns array
+                .map(Arrays::asList)
+                .block();
     }
 }

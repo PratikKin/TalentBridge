@@ -22,23 +22,18 @@ public class JobController {
     @PostMapping("/create")
     public ResponseEntity<JobResponse> createJob(@RequestBody JobRequest request) {
         if (!"RECRUITER".equalsIgnoreCase(String.valueOf(request.getRequestInfo().getRole()))) {
-            System.out.println("Unauthorized attempt to create job by user with role: " + request.getRequestInfo().getRole());
+            System.out.println("Unauthorized attempt to create job by user with role: "
+                    + request.getRequestInfo().getRole());
             return ResponseEntity.status(403).build(); // Forbidden
         }
 
-        Job createdJob = jobService.createJob(request);
-
-        JobResponse response = new JobResponse();
-        response.setJob(createdJob);
-        response.setCreatedBy(request.getRequestInfo().getId());
-        response.setStatus(JobStatus.ACTIVE);
-
+        JobResponse response = jobService.createJob(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllJobs() {
-        List<Job> jobs = jobService.getAllJobs();
-        return ResponseEntity.ok(jobs);
+
+        return ResponseEntity.ok(jobService.getAllJobs());
     }
 }

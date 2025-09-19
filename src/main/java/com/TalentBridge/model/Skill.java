@@ -7,8 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "skills")
+@Data
 public class Skill {
 
     @Id

@@ -9,8 +9,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "jobs")
+@Data
+@Embeddable
 public class Job {
 
     @Id
